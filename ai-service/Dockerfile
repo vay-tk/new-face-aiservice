@@ -1,6 +1,6 @@
 FROM python:3.9-slim
 
-# Install system dependencies for OpenCV and dlib
+# Install system dependencies for OpenCV and dlib in a single layer
 RUN apt-get update && apt-get install -y \
     cmake \
     libopenblas-dev \
@@ -12,24 +12,31 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender-dev \
     libgl1-mesa-glx \
-    libglib2.0-0 \
     build-essential \
-    && rm -rf /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt/*
 
 WORKDIR /app
 
-# Copy requirements and install Python dependencies
+# Copy requirements first for better caching
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
 
 # Create non-root user
-RUN adduser --disabled-password --gecos '' appuser
-RUN chown -R appuser:appuser /app
+RUN adduser --disabled-password --gecos '' appuser \
+    && chown -R appuser:appuser /app
+
 USER appuser
 
-EXPOSE 8000
+# Railway automatically assigns PORT environment variable
+EXPOSE $PORT
 
-CMD ["python", "app.py"]
+# Use Railway's PORT environment variable
+CMD python app.py
