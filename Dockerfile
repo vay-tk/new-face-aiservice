@@ -1,50 +1,20 @@
 FROM python:3.9-slim
 
-# Install system dependencies for OpenCV and dlib in a single layer
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     cmake \
-    libopenblas-dev \
-    liblapack-dev \
-    libx11-dev \
-    libgtk-3-dev \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    libgl1-mesa-dri \
-    libglib2.0-0 \
-    libxrandr2 \
-    libxss1 \
-    libxcursor1 \
-    libxcomposite1 \
-    libasound2 \
-    libxi6 \
-    libxtst6 \
     build-essential \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /var/cache/apt/*
+    libopencv-dev \
+    python3-opencv \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Copy requirements first for better caching
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Python dependencies
-RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
-
-# Copy application code
 COPY . .
 
-# Create non-root user
-RUN adduser --disabled-password --gecos '' appuser \
-    && chown -R appuser:appuser /app
+EXPOSE 8000
 
-USER appuser
-
-# Railway automatically assigns PORT environment variable
-EXPOSE $PORT
-
-# Use explicit CMD format
-CMD ["python", "app.py"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
