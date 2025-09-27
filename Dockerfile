@@ -11,7 +11,15 @@ RUN apt-get update && apt-get install -y \
     libsm6 \
     libxext6 \
     libxrender-dev \
-    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    libglib2.0-0 \
+    libxrandr2 \
+    libxss1 \
+    libxcursor1 \
+    libxcomposite1 \
+    libasound2 \
+    libxi6 \
+    libxtst6 \
     build-essential \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
