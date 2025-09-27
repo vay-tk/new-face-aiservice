@@ -9,7 +9,6 @@ WORKDIR /app
 # Install required system dependencies for dlib & opencv
 
 RUN apt-get update && apt-get install -y 
-build-essential 
 cmake 
 g++ 
 make 
