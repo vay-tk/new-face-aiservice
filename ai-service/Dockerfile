@@ -38,5 +38,5 @@ USER appuser
 # Railway automatically assigns PORT environment variable
 EXPOSE $PORT
 
-# Use Railway's PORT environment variable
-CMD python app.py
+# Use explicit CMD format
+CMD ["python", "app.py"]
