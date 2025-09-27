@@ -1,44 +1,50 @@
+# Use Debian Bullseye (better for compiling dlib than slim)
 
-# Use Python 3.10 slim
-FROM python:3.10-slim
+FROM python:3.10-bullseye
 
 # Set working directory
+
 WORKDIR /app
 
-# Install required system dependencies for dlib & opencv
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    cmake \
-    g++ \
-    make \
-    wget \
-    curl \
-    unzip \
-    pkg-config \
-    libopenblas-dev \
-    liblapack-dev \
-    libgtk2.0-dev \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies required for dlib, opencv, and face-recognition
 
-# Upgrade pip and tools
+RUN apt-get update && apt-get install -y 
+build-essential 
+cmake 
+g++ 
+make 
+wget 
+curl 
+unzip 
+pkg-config 
+libopenblas-dev 
+liblapack-dev 
+libgtk2.0-dev 
+libgl1 
+libglib2.0-0 
+libsm6 
+libxext6 
+libxrender-dev 
+python3-dev 
+&& rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip & setuptools
+
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Copy dependency file
-COPY requirements.txt .
+# Copy requirements and install Python deps
 
-# Install Python dependencies (force binary if available)
+COPY requirements.txt .
 RUN pip install --no-cache-dir --prefer-binary -r requirements.txt
 
 # Copy project files
+
 COPY . .
 
-# Expose port
+# Expose port for Render
+
 EXPOSE 8000
 
-# Run the FastAPI app
+# Start FastAPI with uvicorn
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
