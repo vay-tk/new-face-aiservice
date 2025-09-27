@@ -1,4 +1,4 @@
-```dockerfile
+
 # Use official Python base image
 FROM python:3.10-slim
 
@@ -39,5 +39,3 @@ EXPOSE 8000
 # Run your app (adjust if you use uvicorn/flask/django)
 # Example: Flask app in app.py
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-```
