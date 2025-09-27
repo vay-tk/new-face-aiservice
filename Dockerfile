@@ -1,11 +1,9 @@
 
-# Use official Python base image
 FROM python:3.10-slim
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies for dlib, face-recognition, and opencv
+# Install system packages required for dlib & opencv
 RUN apt-get update && apt-get install -y \
     build-essential \
     cmake \
@@ -21,21 +19,20 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     && rm -rf /var/lib/apt/lists/*
 
-# Upgrade pip
-RUN pip install --no-cache-dir --upgrade pip
+# Upgrade pip and setuptools
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 
-# Copy requirements file
+# Copy requirements first
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies, force prebuilt binaries
+RUN pip install --no-cache-dir --prefer-binary -r requirements.txt
 
 # Copy project files
 COPY . .
 
-# Expose the port Render will use
 EXPOSE 8000
 
-# Run your app (adjust if you use uvicorn/flask/django)
-# Example: Flask app in app.py
+# Start FastAPI with uvicorn (adjust if your entrypoint is different)
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
